@@ -29,6 +29,7 @@ public class GetCustomer
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getCustomerJSON(@PathParam("tempCustID") int tempCustID) throws IOException
 	{
+		System.out.println(System.getProperty("user.dir"));
 		pullData(System.getProperty("user.dir") + "\\user_data.txt");
 		String strCustomJSON = (getCustomer(tempCustID));
 		return strCustomJSON;
