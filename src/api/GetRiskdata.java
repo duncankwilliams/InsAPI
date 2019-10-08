@@ -7,7 +7,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.lang.String;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.HttpURLConnection;
@@ -17,6 +20,8 @@ import java.util.concurrent.TimeUnit;
 public class GetRiskdata 
 {
 	public static ArrayList<ArrayList<Double>> rdList = new ArrayList<ArrayList<Double>>();
+	public static String fileDir = System.getProperty("user.dir") + "\\";
+	public static String whiteListFN = "whitelist.txt";
     public static boolean firstRun = true;
 	
 	/** Runs the pullRiskDataJSON() method for the ID given in the URL
@@ -26,12 +31,17 @@ public class GetRiskdata
 	 * @throws Exception
 	 */
     @GET
-	@Path("{tempRdID}")
+	@Path("{apiKey}/{tempRdID}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getRiskDataJSON(@PathParam("tempRdID") int tempRdID) throws Exception
+	public String getRiskDataJSON(@PathParam("apiKey") int apiKey, @PathParam("tempRdID") int tempRdID) throws Exception
 	{
-        String riskData = pullRiskDataJSON(tempRdID);
-		return riskData;
+        if (checkKey(whiteListFN, apiKey))
+        {
+        	String riskData = pullRiskDataJSON(tempRdID);
+        	return riskData;
+        }
+        else
+        	return "Invalid API Key";
 	}
 	
 	/** Makes a call to an API and converts the response line by line as an array of doubles
@@ -109,5 +119,23 @@ public class GetRiskdata
         }
 
         return jsonStr;
+    }
+	
+	public static boolean checkKey(String fileName, int key) throws IOException
+    {
+        File file = new File(fileDir + fileName);
+        Scanner input = new Scanner(file);
+        boolean valid = false;
+        while (input.hasNext())
+        {
+            if (input.nextLine().equals(Integer.toString(key)))
+            {
+                valid = true;
+                input.close();
+                return valid;
+            }
+        }
+        input.close();
+        return valid;
     }
 }

@@ -17,6 +17,9 @@ import java.util.ArrayList;
 public class GetCustomer 
 {
 	public static ArrayList<String[]> custList = new ArrayList<String[]>();
+	public static String fileDir = System.getProperty("user.dir") + "\\";
+	public static String userDataFN = "user_data.txt";
+	public static String whiteListFN = "whitelist.txt";
 	
 	/** Calls a method to pull data from a text file and return it as a JSON String
 	 * 
@@ -25,17 +28,25 @@ public class GetCustomer
 	 * @throws IOException
 	 */
 	@GET
-	@Path("{tempCustID}")
+	@Path("{apiKey}/{tempCustID}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getCustomerJSON(@PathParam("tempCustID") int tempCustID) throws IOException
+	public String getCustomerJSON(@PathParam("apiKey") int apiKey ,@PathParam("tempCustID") int tempCustID) throws IOException
 	{
-		System.out.println(System.getProperty("user.dir"));
-		pullData(System.getProperty("user.dir") + "\\user_data.txt");
-		String strCustomJSON = (getCustomer(tempCustID));
-		return strCustomJSON;
+		System.out.println(fileDir);
+		if (checkKey(whiteListFN, apiKey))
+		{
+			System.out.println(fileDir);
+			pullData(fileDir + userDataFN);
+			String strCustomJSON = (getCustomer(tempCustID));
+			return strCustomJSON;
+		}
+		
+		else
+			return "Invalid API Key";
+		
 	}
 	
-	/** Converts a txt file into an arraylist of arrays, on array for each customer
+	/** Converts a .txt file into an ArrayList of arrays, on array for each customer
 	 * 
 	 * @param fileName - file to be read and converted into an array
 	 * @throws IOException
@@ -81,5 +92,30 @@ public class GetCustomer
             	jsonStr =  "No customer exists with an ID of " + id + ".";
         }
         return jsonStr;
+    }
+	
+	/** Searches a .txt file for a specific api key to either allow or decline access to the requestor
+	 * 
+	 * @param fileName - the file to read and look for api key in
+	 * @param key - the api key to look for
+	 * @return - true if api key is in whitelist and false if it isn't
+	 * @throws IOException
+	 */
+	public static boolean checkKey(String fileName, int key) throws IOException
+    {
+        File file = new File(fileDir + fileName);
+        Scanner input = new Scanner(file);
+        boolean valid = false;
+        while (input.hasNext())
+        {
+            if (input.nextLine().equals(Integer.toString(key)))
+            {
+                valid = true;
+                input.close();
+                return valid;
+            }
+        }
+        input.close();
+        return valid;
     }
 }

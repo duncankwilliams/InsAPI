@@ -16,6 +16,9 @@ import java.util.Scanner;
 public class GetEmployment
 {
 	public static ArrayList<String[]> empList = new ArrayList<String[]>();
+	public static String fileDir = System.getProperty("user.dir") + "\\";
+	public static String whiteListFN = "whitelist.txt";
+	public static String empDataFN = "emp_data.txt";
 	
 	/** Retrieves employment data from a .txt file and returns it as a JSON String
 	 * 
@@ -24,29 +27,34 @@ public class GetEmployment
 	 * @throws Exception
 	 */
 	@GET
-	@Path("{tempAppID}")
+	@Path("{apiKey}/{tempAppID}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getQuoteJSON(@PathParam("tempAppID") int tempAppID) throws Exception
+	public String getQuoteJSON(@PathParam("apiKey") int apiKey, @PathParam("tempAppID") int tempAppID) throws Exception
 	{
-		pullData(System.getProperty("user.dir") + "\\emp_data.txt");
-		String jsonStr = "";
-		for (int i = 0; i < empList.size(); i++)
-        {
-            if (tempAppID == Integer.parseInt((empList.get(i)[0])))
-            {
-            	jsonStr = "[\n{\n\t\"id\": \"" + empList.get(i)[0] +  
-                		"\", \n\t\"employer\": \"" + empList.get(i)[1] + 
-                        "\", \n\t\"role\": \"" + empList.get(i)[2] + 
-                        "\", \n\t\"duration\": \"" + empList.get(i)[3] +
-                        "\", \n\t\"ctc\": \"" + empList.get(i)[4] +
-                        "\", \n\t\"contact\": \"" + empList.get(i)[5] +
-                        "\"\n}\n]";
-            	return jsonStr;
-            }
-            else
-            	jsonStr = "No customer exists with an ID of " + tempAppID + ".";
-        }
-		return jsonStr;
+		if (checkKey(whiteListFN, apiKey))
+		{
+			pullData(fileDir + empDataFN);
+			String jsonStr = "";
+			for (int i = 0; i < empList.size(); i++)
+	        {
+	            if (tempAppID == Integer.parseInt((empList.get(i)[0])))
+	            {
+	            	jsonStr = "[\n{\n\t\"id\": \"" + empList.get(i)[0] +  
+	                		"\", \n\t\"employer\": \"" + empList.get(i)[1] + 
+	                        "\", \n\t\"role\": \"" + empList.get(i)[2] + 
+	                        "\", \n\t\"duration\": \"" + empList.get(i)[3] +
+	                        "\", \n\t\"ctc\": \"" + empList.get(i)[4] +
+	                        "\", \n\t\"contact\": \"" + empList.get(i)[5] +
+	                        "\"\n}\n]";
+	            	return jsonStr;
+	            }
+	            else
+	            	jsonStr = "No customer exists with an ID of " + tempAppID + ".";
+	        }
+			return jsonStr;
+		}
+		else
+			return "Invalid API Key";
 	}
 	
 	public static void pullData(String fileName) throws IOException
@@ -61,5 +69,23 @@ public class GetEmployment
             empList.add(input);
         }
         scan.close();
+    }
+	
+	public static boolean checkKey(String fileName, int key) throws IOException
+    {
+        File file = new File(fileDir + fileName);
+        Scanner input = new Scanner(file);
+        boolean valid = false;
+        while (input.hasNext())
+        {
+            if (input.nextLine().equals(Integer.toString(key)))
+            {
+                valid = true;
+                input.close();
+                return valid;
+            }
+        }
+        input.close();
+        return valid;
     }
 }
