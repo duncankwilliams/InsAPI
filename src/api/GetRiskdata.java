@@ -21,7 +21,8 @@ import java.io.IOException;
 public class GetRiskdata 
 {
 	public static ArrayList<ArrayList<Double>> rdList = new ArrayList<ArrayList<Double>>();
-	public static String fileDir = "data\\";
+	//public static String fileDir = System.getProperty("user.dir") + "\\";
+	//public static String fileDir = "/data/";
 	public static String whiteListFN = "whitelist.txt";
     public static boolean firstRun = true;
 	
@@ -122,10 +123,18 @@ public class GetRiskdata
         return jsonStr;
     }
 	
-	public static boolean checkKey(String fileName, int key) throws IOException
+	public File getFile(String fileName)
+	{
+		ClassLoader classLoader = new GetRiskdata().getClass().getClassLoader();
+        File file = new File(classLoader.getResource(fileName).getFile());
+        System.out.println(fileName + "File Found : " + file.exists());
+		return file;
+	}
+	
+	public boolean checkKey(String fileName, int key) throws IOException
     {
-        File file = new File(fileDir + fileName);
-        Scanner input = new Scanner(file);
+		File retrievedFile = getFile(fileName);
+		Scanner input = new Scanner(retrievedFile);
         boolean valid = false;
         while (input.hasNext())
         {

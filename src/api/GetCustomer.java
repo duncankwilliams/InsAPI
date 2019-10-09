@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class GetCustomer 
 {
 	public static ArrayList<String[]> custList = new ArrayList<String[]>();
-	public static String fileDir = "data\\";
+	//public static String fileDir = System.getProperty("user.dir") + "\\";
 	public static String userDataFN = "user_data.txt";
 	public static String whiteListFN = "whitelist.txt";
 	
@@ -32,11 +32,9 @@ public class GetCustomer
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getCustomerJSON(@PathParam("apiKey") int apiKey ,@PathParam("tempCustID") int tempCustID) throws IOException
 	{
-		System.out.println(fileDir);
 		if (checkKey(whiteListFN, apiKey))
 		{
-			System.out.println(fileDir);
-			pullData(fileDir + userDataFN);
+			pullData( userDataFN);
 			String strCustomJSON = (getCustomer(tempCustID));
 			return strCustomJSON;
 		}
@@ -53,7 +51,8 @@ public class GetCustomer
 	 */
 	public static void pullData(String fileName) throws IOException
     {
-        File file = new File(fileName);
+		ClassLoader classLoader = new GetCustomer().getClass().getClassLoader();
+        File file = new File(classLoader.getResource(fileName).getFile());
         Scanner scan = new Scanner(file);  
         
         while (scan.hasNext())
@@ -94,6 +93,14 @@ public class GetCustomer
         return jsonStr;
     }
 	
+	public File getFile(String fileName)
+	{
+		ClassLoader classLoader = new GetCustomer().getClass().getClassLoader();
+        File file = new File(classLoader.getResource(fileName).getFile());
+        System.out.println(fileName + "File Found : " + file.exists());
+		return file;
+	}
+	
 	/** Searches a .txt file for a specific api key to either allow or decline access to the requestor
 	 * 
 	 * @param fileName - the file to read and look for api key in
@@ -101,10 +108,10 @@ public class GetCustomer
 	 * @return - true if api key is in whitelist and false if it isn't
 	 * @throws IOException
 	 */
-	public static boolean checkKey(String fileName, int key) throws IOException
+	public boolean checkKey(String fileName, int key) throws IOException
     {
-        File file = new File(fileDir + fileName);
-        Scanner input = new Scanner(file);
+		File retrievedFile = getFile(fileName);
+        Scanner input = new Scanner(retrievedFile);
         boolean valid = false;
         while (input.hasNext())
         {

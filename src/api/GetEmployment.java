@@ -16,7 +16,7 @@ import java.util.Scanner;
 public class GetEmployment
 {
 	public static ArrayList<String[]> empList = new ArrayList<String[]>();
-	public static String fileDir = "data\\";
+	//public static String fileDir = System.getProperty("user.dir") + "\\";
 	public static String whiteListFN = "whitelist.txt";
 	public static String empDataFN = "emp_data.txt";
 	
@@ -31,10 +31,9 @@ public class GetEmployment
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getQuoteJSON(@PathParam("apiKey") int apiKey, @PathParam("tempAppID") int tempAppID) throws Exception
 	{
-		System.out.println(fileDir);
 		if (checkKey(whiteListFN, apiKey))
 		{
-			pullData(fileDir + empDataFN);
+			pullData(empDataFN);
 			String jsonStr = "";
 			for (int i = 0; i < empList.size(); i++)
 	        {
@@ -60,7 +59,8 @@ public class GetEmployment
 	
 	public static void pullData(String fileName) throws IOException
     {
-        File file = new File(fileName);
+		ClassLoader classLoader = new GetEmployment().getClass().getClassLoader();
+        File file = new File(classLoader.getResource(fileName).getFile());
         Scanner scan = new Scanner(file);  
         
         while (scan.hasNext())
@@ -72,10 +72,18 @@ public class GetEmployment
         scan.close();
     }
 	
-	public static boolean checkKey(String fileName, int key) throws IOException
+	public File getFile(String fileName)
+	{
+		ClassLoader classLoader = new GetEmployment().getClass().getClassLoader();
+        File file = new File(classLoader.getResource(fileName).getFile());
+        System.out.println(fileName + "File Found : " + file.exists());
+		return file;
+	}
+	
+	public boolean checkKey(String fileName, int key) throws IOException
     {
-        File file = new File(fileDir + fileName);
-        Scanner input = new Scanner(file);
+		File retrievedFile = getFile(fileName);
+        Scanner input = new Scanner(retrievedFile);
         boolean valid = false;
         while (input.hasNext())
         {

@@ -2,6 +2,7 @@
     <wb-module deploy-name="InsAPI">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/data"/>
         <property name="context-root" value="InsAPI"/>
         <property name="java-output-path" value="/InsAPI/build/classes"/>
     </wb-module>
