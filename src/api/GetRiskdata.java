@@ -15,12 +15,13 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.HttpURLConnection;
 import java.util.concurrent.TimeUnit;
+import java.io.IOException;
 
 @Path("/getriskdata")
 public class GetRiskdata 
 {
 	public static ArrayList<ArrayList<Double>> rdList = new ArrayList<ArrayList<Double>>();
-	public static String fileDir = System.getProperty("user.dir") + "\\";
+	public static String fileDir = "data\\";
 	public static String whiteListFN = "whitelist.txt";
     public static boolean firstRun = true;
 	

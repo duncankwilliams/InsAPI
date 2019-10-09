@@ -16,7 +16,7 @@ import java.util.Scanner;
 public class GetEmployment
 {
 	public static ArrayList<String[]> empList = new ArrayList<String[]>();
-	public static String fileDir = System.getProperty("user.dir") + "\\";
+	public static String fileDir = "data\\";
 	public static String whiteListFN = "whitelist.txt";
 	public static String empDataFN = "emp_data.txt";
 	
@@ -31,6 +31,7 @@ public class GetEmployment
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getQuoteJSON(@PathParam("apiKey") int apiKey, @PathParam("tempAppID") int tempAppID) throws Exception
 	{
+		System.out.println(fileDir);
 		if (checkKey(whiteListFN, apiKey))
 		{
 			pullData(fileDir + empDataFN);

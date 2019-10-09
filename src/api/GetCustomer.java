@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class GetCustomer 
 {
 	public static ArrayList<String[]> custList = new ArrayList<String[]>();
-	public static String fileDir = System.getProperty("user.dir") + "\\";
+	public static String fileDir = "data\\";
 	public static String userDataFN = "user_data.txt";
 	public static String whiteListFN = "whitelist.txt";
 	
